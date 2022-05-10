@@ -1,0 +1,110 @@
+---
+title: "Project Plotting"
+author: "E.X."
+date: "9/11/2021"
+output: 
+  html_document:
+      toc: true
+      toc_depth: 3
+      toc_float: true
+      number_sections: true
+      code_folding: hide
+---
+
+```{r setup, message=F, warning=F}
+knitr::opts_chunk$set(echo = T, include = T, warning = F)
+library(data.table)
+library(tidyverse)
+library(metap)
+library(skimr)
+library(rlang)
+library(qqman)
+```
+
+## Now plotting
+
+```{r meta.and.ptv.plotting}
+###
+# read in prepared file for plotting
+###
+# multi.meta.for.plot
+load("./multi_meta_for_plot.Rda")
+# multi.ptv.for.plot 
+load("./multi_ptv_for_plot.Rda")
+####
+
+meta.plot <- multi.meta.for.plot %>% filter(!is.na(symbol))
+
+ptv.plot <- multi.ptv.for.plot %>% filter(!is.na(symbol))
+
+# plot the first 2 by 2 grid:
+#     row 1 ==> left: meta of meta; right: meta of PTV
+#     row 2 ==> left: meta of SCZ;  right: PTV of SCZ
+#
+
+
+
+par(mfrow=c(2,2))
+qqman::manhattan(meta.plot, 
+                 chr = "chr", bp = "start", p = "final.meta.pvalue.for.plot",
+                 snp = "symbol", annotatePval = 0.00001, 
+                 main = "Meta-analysis of SCZ_meta, ASD_meta and BP_PTV", 
+                 col = c("blue4", "orange3"), ylim=c(0, 20),
+                 genomewideline = -log10(2.14e-6), suggestiveline = F)
+
+qqman::manhattan(ptv.plot, 
+                 chr = "chr", bp = "start", p = "final.meta.pvalue.for.plot",
+                 snp = "symbol", annotatePval = 0.00001, 
+                 main = "Meta-analysis of SCZ_PTV, ASD_PTV and BP_PTV", 
+                 col = c("aquamarine3", "azure4"), ylim=c(0, 20),
+                 genomewideline = -log10(2.14e-6), suggestiveline = F)
+
+qqman::manhattan(meta.plot[!is.na(meta.plot$scz.meta.pvalue),], 
+                 chr = "chr", bp = "start", p = "scz.meta.pvalue",
+                 snp = "symbol", annotatePval = 0.00001, 
+                 main = "SCZ_meta", 
+                 col = c("blue4", "orange3"), ylim=c(0, 12),
+                 genomewideline = -log10(2.14e-6), suggestiveline = F)
+
+qqman::manhattan(ptv.plot[!is.na(ptv.plot$scz.ptv.pvalue),], 
+                 chr = "chr", bp = "start", p = "scz.ptv.pvalue",
+                 snp = "symbol", annotatePval = 0.00001, 
+                 main = "SCZ_PTV", 
+                 col = c("aquamarine3", "azure4"), ylim=c(0, 12),
+                 genomewideline = -log10(2.14e-6), suggestiveline = F)
+
+
+#
+par(mfrow = c(2,2))
+
+qqman::manhattan(meta.plot[!is.na(meta.plot$asd.meta.pvalue.for.plot),], 
+                 chr = "chr", bp = "start", p = "asd.meta.pvalue.for.plot",
+                 snp = "symbol", annotatePval = 0.00001, 
+                 main = "ASD_meta", 
+                 col = c("blue4", "orange3"), ylim=c(0, 20),
+                 genomewideline = -log10(2.14e-6), suggestiveline = F)
+
+
+qqman::manhattan(ptv.plot[!is.na(ptv.plot$asd.ptv.pvalue),], 
+                 chr = "chr", bp = "start", p = "asd.ptv.pvalue",
+                 snp = "symbol",  
+                 main = "ASD_PTV", 
+                 col = c("aquamarine3", "azure4"), ylim=c(0, 20),
+                 genomewideline = -log10(2.14e-6), suggestiveline = F)
+
+
+qqman::manhattan(meta.plot[!is.na(meta.plot$bp.ptv.pvalue),], 
+                 chr = "chr", bp = "start", p = "bp.ptv.pvalue",
+                 snp = "symbol", 
+                 main = "BP_PTV", 
+                 col = c("blue4", "orange3"), 
+                 genomewideline = -log10(2.14e-6), suggestiveline = F)
+
+qqman::manhattan(ptv.plot[!is.na(ptv.plot$bp.ptv.pvalue),], 
+                 chr = "chr", bp = "start", p = "bp.ptv.pvalue",
+                 snp = "symbol", 
+                 main = "BP_PTV", 
+                 col = c("aquamarine3", "azure4"), 
+                 genomewideline = -log10(2.14e-6), suggestiveline = F)
+```
+
